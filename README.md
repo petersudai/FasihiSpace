@@ -1,1 +1,1 @@
-FasihiSpace is blogging platform created by Peter Sudai.
+FasihiSpace is a blogging platform created by Peter Sudai.
