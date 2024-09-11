@@ -1,5 +1,5 @@
 const express = require('express');
-const { createPost, getPosts, updatePost, deletePost } = require('../controllers/postController');
+const { createPost, getPosts, getPost, updatePost, deletePost } = require('../controllers/postController');
 const auth = require('../middleware/auth');  // JWT auth middleware
 const router = express.Router();
 
@@ -8,6 +8,9 @@ router.post('/', auth, createPost);
 
 // Get all blog posts
 router.get('/', getPosts);
+
+// Get a single post by ID
+router.get('/:id', getPost);
 
 // Update a blog post
 router.put('/:id', auth, updatePost);
