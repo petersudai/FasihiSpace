@@ -7,20 +7,40 @@ exports.registerUser = async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
+    // Check if the user already exists
     let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ msg: 'User already exists' });
+    if (user) {
+      return res.status(400).json({ msg: 'User already exists' });
+    }
 
-    user = new User({ name, email, password });
+    // Create a new user
+    user = new User({
+      name,
+      email,
+      password,
+    });
 
+    // Hash the password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
-    
+
+    // Save the user
     await user.save();
 
-    const payload = { user: { id: user.id } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 });
-    res.json({ token });
+    // Create JWT payload
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    // Sign JWT token and return it
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 }, (err, token) => {
+      if (err) throw err;
+      res.json({ token });
+    });
   } catch (err) {
+    console.error(err.message);
     res.status(500).send('Server error');
   }
 };
@@ -40,6 +60,17 @@ exports.loginUser = async (req, res) => {
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 });
     res.json({ token });
   } catch (err) {
+    res.status(500).send('Server error');
+  }
+};
+
+// Fetch all users (new method)
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, 'name email');  // Fetch only the 'name' and 'email' fields
+    res.json(users);
+  } catch (err) {
+    console.error(err.message);
     res.status(500).send('Server error');
   }
 };

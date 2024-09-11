@@ -5,8 +5,9 @@ import PostList from './components/PostList';
 import Post from './components/Post';
 import PostForm from './components/PostForm';
 import LoginForm from './components/LoginForm';
-import './styles/styles.css';
 import RegisterForm from './components/RegisterForm';
+import UsersPage from './components/UsersPage';
+import './styles/styles.css';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -22,6 +23,7 @@ function App() {
         <Route path="/create" element={<PostForm token={token} />} />
         <Route path="/edit/:id" element={<PostForm token={token} />} />
         <Route path="/posts/:id" element={<Post />} />
+        <Route path="/users" element={<UsersPage />} />
       </Routes>
     </Router>
   );

@@ -20,10 +20,14 @@ function Header({ isLoggedIn, setIsLoggedIn, setToken }) {
           {isLoggedIn ? (
             <>
               <Link to="/create">New Post</Link>
+              <Link to="/users">Users</Link>
               <button onClick={handleLogout} className="logout-btn">Logout</button>
             </>
           ) : (
-            <Link to="/login">Login</Link>
+            <>
+              <Link to="/login">Login</Link>
+              <Link to="/register">Register</Link>
+            </>
           )}
         </nav>
       </div>
@@ -32,3 +36,4 @@ function Header({ isLoggedIn, setIsLoggedIn, setToken }) {
 }
 
 export default Header;
+
