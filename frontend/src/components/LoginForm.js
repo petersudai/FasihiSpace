@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function LoginForm({ setToken }) {
+function LoginForm({ setToken, setUser }) {  // Add setUser as a prop to store user's name
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -15,9 +15,10 @@ function LoginForm({ setToken }) {
         email,
         password,
       });
-      setToken(res.data.token);  // Set token in state
-      setError(null);  // Clear error if login is successful
-      navigate('/');  // Redirect to home after successful login
+      setToken(res.data.token);  // Store token
+      setUser(res.data.user.name);  // Store user's name
+      setError(null);
+      navigate('/');
     } catch (err) {
       setError('Invalid credentials, please try again.');
       console.error(err);

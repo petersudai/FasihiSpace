@@ -11,14 +11,14 @@ import './styles/styles.css';
 
 function App() {
   const [token, setToken] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);  // Add state to store the user's name
 
   return (
     <Router>
-      <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} setToken={setToken} />
-      <Routes> {}
+      <Header isLoggedIn={!!token} setIsLoggedIn={setToken} user={user} setToken={setToken} />
+      <Routes>
         <Route path="/" element={<PostList />} />
-        <Route path="/login" element={<LoginForm setToken={setToken} />} />
+        <Route path="/login" element={<LoginForm setToken={setToken} setUser={setUser} />} /> {/* Pass setUser to LoginForm */}
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/create" element={<PostForm token={token} />} />
         <Route path="/edit/:id" element={<PostForm token={token} />} />

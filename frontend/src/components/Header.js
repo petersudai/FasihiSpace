@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-function Header({ isLoggedIn, setIsLoggedIn, setToken }) {
+function Header({ isLoggedIn, setIsLoggedIn, setToken, user }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -14,9 +14,8 @@ function Header({ isLoggedIn, setIsLoggedIn, setToken }) {
   return (
     <header className="header">
       <div className="header-content">
-        <h1>FasihiSpace</h1>
+        <Link to="/" className="logo">FasihiSpace</Link> {/* Clickable logo */}
         <nav>
-          <Link to="/">Home</Link>
           {isLoggedIn ? (
             <>
               <Link to="/create">New Post</Link>
@@ -31,9 +30,14 @@ function Header({ isLoggedIn, setIsLoggedIn, setToken }) {
           )}
         </nav>
       </div>
+
+      {isLoggedIn && (
+        <div className="user-info"> {/* User info positioned at the top right */}
+          <span>Welcome, {user}!</span>
+        </div>
+      )}
     </header>
   );
 }
 
 export default Header;
-

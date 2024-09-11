@@ -14,17 +14,51 @@
   }
   
   .header {
-    background-color: var(--dark-blue);
-    padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: var(--dark-blue);
+    padding: 10px 20px;
+    position: relative;
   }
   
   .header h1 {
     color: var(--primary-red);
   }
   
+  .header-content {
+    display: flex;
+    align-items: center;
+  }
+
+  .logo {
+    font-size: 24px;
+    color: var(--primary-red);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  nav {
+    display: flex;
+    gap: 15px;
+  }
+  
+  nav a, .logout-btn {
+    color: var(--light-grey);
+    text-decoration: none;
+    font-size: 16px;
+  }
+  
+  nav a:hover, .logout-btn:hover {
+    color: var(--primary-red);
+  }
+  
+  .logout-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
   .header nav a {
     color: var(--light-grey);
     margin: 0 10px;
@@ -60,4 +94,19 @@
   
   button:hover {
     background-color: var(--dark-blue);
-  }  
+  }
+
+  /* Styles for the user info displayed at the top right */
+.user-info {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 16px;
+    color: var(--light-grey);
+    font-weight: bold;
+  }
+  
+  .user-info span {
+    font-size: 16px;
+    color: var(--light-grey);
+  }
