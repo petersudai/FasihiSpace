@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function PostForm({ token }) {
+  const { id } = useParams();  // Get post ID if we're editing
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
-  const { id } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
-      // Fetch the post data for editing
-      axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`)
-        .then((res) => {
+      // If editing, fetch the post data
+      const fetchPost = async () => {
+        try {
+          const res = await axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`);
           setTitle(res.data.title);
           setBody(res.data.body);
-        })
-        .catch((err) => console.error(err));
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      fetchPost();
     }
   }, [id]);
 
@@ -27,17 +32,17 @@ function PostForm({ token }) {
 
     try {
       if (id) {
-        // Update an existing post
+        // If editing, send a PUT request
         await axios.put(`${process.env.REACT_APP_API_URL}/posts/${id}`, postData, {
-          headers: { 'x-auth-token': token }
+          headers: { 'x-auth-token': token },
         });
       } else {
-        // Create a new post
+        // If creating a new post, send a POST request
         await axios.post(`${process.env.REACT_APP_API_URL}/posts`, postData, {
-          headers: { 'x-auth-token': token }
+          headers: { 'x-auth-token': token },
         });
       }
-      navigate('/');
+      navigate('/'); // Redirect to home after saving
     } catch (err) {
       console.error(err);
     }

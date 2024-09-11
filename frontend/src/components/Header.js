@@ -8,7 +8,7 @@ function Header({ isLoggedIn, setIsLoggedIn, setToken, user }) {
     // Clear token and set the login state to false
     setToken(null);
     setIsLoggedIn(false);
-    navigate('/');
+    navigate('/login');
   };
 
   return (
@@ -33,7 +33,7 @@ function Header({ isLoggedIn, setIsLoggedIn, setToken, user }) {
 
       {isLoggedIn && (
         <div className="user-info"> {/* User info positioned at the top right */}
-          <span>Welcome, {user}!</span>
+          <span>Welcome, {user ? user.name : 'Guest'}!</span>
         </div>
       )}
     </header>

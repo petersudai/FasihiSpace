@@ -12,10 +12,10 @@ router.get('/', getPosts);
 // Get a single post by ID
 router.get('/:id', getPost);
 
-// Update a blog post
+// Update a blog post (Only the owner can update)
 router.put('/:id', auth, updatePost);
 
-// Delete a blog post
+// Delete a blog post (Only the owner can delete)
 router.delete('/:id', auth, deletePost);
 
 module.exports = router;

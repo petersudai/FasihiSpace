@@ -50,30 +50,37 @@ exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Check if the user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
+    // Check if the password matches
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
+    // Create JWT payload
     const payload = {
       user: {
         id: user.id,
-        name: user.name,  // Include the user's name in the payload
+        name: user.name,  // Including user's name in the JWT payload
       },
     };
 
+    // Sign the JWT token and return it with the full user object
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
       { expiresIn: '1h' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token, user: { name: user.name } });  // Return the user's name along with the token
+        res.json({
+          token,
+          user: { _id: user._id, name: user.name, email: user.email },  // Return full user object
+        });
       }
     );
   } catch (err) {
@@ -81,7 +88,6 @@ exports.loginUser = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
-
 
 // Fetch all users (new method)
 exports.getAllUsers = async (req, res) => {

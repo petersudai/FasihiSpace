@@ -28,7 +28,7 @@ exports.getPosts = async (req, res) => {
 // Get a single post by ID
 exports.getPost = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id).populate('user', ['name']);
+    const post = await Post.findById(req.params.id).populate('user', ['name', '_id']);
     if (!post) {
       return res.status(404).json({ msg: 'Post not found' });
     }
@@ -42,13 +42,29 @@ exports.getPost = async (req, res) => {
 // Update a blog post
 exports.updatePost = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
-    if (post.user.toString() !== req.user.id) return res.status(401).json({ msg: 'Unauthorized' });
-    post.title = req.body.title;
-    post.body = req.body.body;
-    await post.save();
-    res.json(post);
+    // Find the post by ID
+    let post = await Post.findById(req.params.id);
+
+    // Check if the post exists
+    if (!post) {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+
+    // Check if the user requesting the update is the owner of the post
+    if (post.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'User not authorized' });
+    }
+
+    // Update the post content
+    post = await Post.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },  // Update with new data
+      { new: true }  // Return the updated post
+    );
+
+    res.json(post);  // Send the updated post back to the client
   } catch (err) {
+    console.error(err.message);
     res.status(500).send('Server error');
   }
 };
@@ -56,11 +72,25 @@ exports.updatePost = async (req, res) => {
 // Delete a blog post
 exports.deletePost = async (req, res) => {
   try {
+    // Find the post by ID
     const post = await Post.findById(req.params.id);
-    if (post.user.toString() !== req.user.id) return res.status(401).json({ msg: 'Unauthorized' });
-    await post.remove();
+
+    // Check if the post exists
+    if (!post) {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+
+    // Check if the user requesting the deletion is the owner of the post
+    if (post.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'User not authorized' });
+    }
+
+    // Delete the post
+    await Post.findByIdAndDelete(req.params.id);
+
     res.json({ msg: 'Post removed' });
   } catch (err) {
+    console.error(err.message);
     res.status(500).send('Server error');
   }
 };
