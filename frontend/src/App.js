@@ -7,6 +7,7 @@ import PostForm from './components/PostForm';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import UsersPage from './components/UsersPage';
+import Profile from './components/Profile';
 import './styles/styles.css';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
         <Route path="/edit/:id" element={token ? <PostForm token={token} /> : <Navigate to="/login" />} />
         <Route path="/posts/:id" element={<Post token={token} user={user} />} />
         <Route path="/users" element={<UsersPage />} />
+        <Route path="/profile" element={token ? <Profile token={token} /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );
