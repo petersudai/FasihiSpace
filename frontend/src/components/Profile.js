@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 function Profile({ token }) {
@@ -84,7 +85,13 @@ function Profile({ token }) {
       <h3>My Posts</h3>
       <ul>
         {posts.map((post) => (
-          <li key={post._id}>{post.title}</li>
+          <li key={post._id}>
+            <Link to={`/posts/${post._id}`}>
+              <strong>{post.title}</strong> {/* Clicking this will take the user to the post */}
+            </Link>
+            <p>{post.body.slice(0, 100)}... <Link to={`/posts/${post._id}`}>Read more</Link></p>
+            <small>Posted on: {new Date(post.date).toLocaleDateString()}</small>
+          </li>
         ))}
       </ul>
     </div>
