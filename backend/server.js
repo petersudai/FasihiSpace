@@ -3,6 +3,8 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const cors = require('cors'); // Import CORS middleware
 
+const profileRoutes = require('./routes/profile');
+
 dotenv.config();
 connectDB();
 
@@ -28,6 +30,8 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
+
+app.use('/api/profile', profileRoutes); 
 
 // Test route for debugging CORS
 app.get('/test', (req, res) => {

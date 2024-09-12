@@ -14,12 +14,15 @@ function Header({ isLoggedIn, setIsLoggedIn, setToken, user }) {
   return (
     <header className="header">
       <div className="header-content">
-        <Link to="/" className="logo">FasihiSpace</Link> {/* Clickable logo */}
+        {/* Clickable FasihiSpace logo that navigates to home */}
+        <Link to="/" className="logo">FasihiSpace</Link> 
+
         <nav>
           {isLoggedIn ? (
             <>
               <Link to="/create">New Post</Link>
               <Link to="/users">Users</Link>
+              <Link to="/profile">Profile</Link> {/* Link to Profile page */}
               <button onClick={handleLogout} className="logout-btn">Logout</button>
             </>
           ) : (
@@ -32,7 +35,7 @@ function Header({ isLoggedIn, setIsLoggedIn, setToken, user }) {
       </div>
 
       {isLoggedIn && (
-        <div className="user-info"> {/* User info positioned at the top right */}
+        <div className="user-info" style={{ position: 'absolute', top: '10px', right: '20px' }}>
           <span>Welcome, {user ? user.name : 'Guest'}!</span>
         </div>
       )}
