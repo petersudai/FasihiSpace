@@ -31,7 +31,8 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
 
-app.use('/api/profile', profileRoutes); 
+app.use('/api/profile', profileRoutes);
+app.use('/api/comments', require('./routes/comment'));
 
 // Test route for debugging CORS
 app.get('/test', (req, res) => {

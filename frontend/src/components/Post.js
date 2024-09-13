@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import CommentList from './CommentList';
 
 function Post({ token, user }) {
   const { id } = useParams();
@@ -14,25 +15,17 @@ function Post({ token, user }) {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`);
         setPost(res.data);
 
-        // Debugging: Log post data and logged-in user data
+        // Log post and user data for debugging
         console.log("Post data:", res.data);
         console.log("Logged-in user data:", user);
-
-        console.log("Post Owner ID:", res.data.user?._id);
-        console.log("Logged-in User ID:", user?._id);
 
         // Check if the logged-in user is the owner of the post
         if (res.data.user && res.data.user._id === user?._id) {
           const postOwnerId = String(res.data.user._id);
           const loggedInUserId = String(user._id);
 
-          console.log(`Comparing Post Owner ID (${postOwnerId}) with Logged-in User ID (${loggedInUserId})`);
-
           if (postOwnerId === loggedInUserId) {
-            console.log("User is the owner of the post.");
             setIsOwner(true);
-          } else {
-            console.log("User is NOT the owner of the posty.");
           }
         }
       } catch (err) {
@@ -44,7 +37,7 @@ function Post({ token, user }) {
   }, [id, user]);
 
   const handleDelete = async () => {
-    // Ask the user for confirmation before deleting
+    // Ask for confirmation before deleting
     const confirmDelete = window.confirm("Are you sure you want to delete this post?");
   
     if (confirmDelete) {
@@ -57,23 +50,29 @@ function Post({ token, user }) {
         console.error(err);
       }
     } else {
-      console.log('Delete operation cancelled by user.');
+      console.log('Delete operation cancelled.');
     }
   };
-  
+
+  if (!post) return <p>Loading post...</p>; 
 
   return (
-    <div className="post">
-      <h2>{post.title}</h2>
-      <p>{post.body}</p>
-      <small>Posted by {post.user ? post.user.name : 'Unknown'}</small>
+    <div className="post-container">
+      <div className="post">
+        <h2>{post.title}</h2>
+        <p>{post.body}</p>
+        <small>Posted by {post.user ? post.user.name : 'Unknown'} on {new Date(post.date).toLocaleDateString()}</small>
 
-      {isOwner && (
-        <div>
-          <button onClick={() => navigate(`/edit/${id}`)}>Edit</button>
-          <button onClick={handleDelete}>Delete</button>
-        </div>
-      )}
+        {isOwner && (
+          <div className="post-actions">
+            <button onClick={() => navigate(`/edit/${id}`)}>Edit</button>
+            <button onClick={handleDelete}>Delete</button>
+          </div>
+        )}
+      </div>
+
+      {/* Comments Section */}
+      {post._id && <CommentList postId={post._id} token={token} />}
     </div>
   );
 }
