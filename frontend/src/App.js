@@ -30,7 +30,7 @@ function App() {
         <Route path="/edit/:id" element={token ? <PostForm token={token} /> : <Navigate to="/login" />} />
         <Route path="/posts/:id" element={<Post token={token} user={user} />} />
         <Route path="/users" element={<UsersPage />} />
-        <Route path="/profile" element={token ? <Profile token={token} /> : <Navigate to="/login" />} />
+        <Route path="/profile" element={token ? <Profile token={token} user={user} /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );

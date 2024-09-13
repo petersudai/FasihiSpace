@@ -5,7 +5,10 @@
     --black: #29252C;
   }
   
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
+
   body {
+    font-family: 'Montserrat', sans-serif !important ;
     margin: 0;
     padding: 0;
     background-color: var(--black);
@@ -13,6 +16,15 @@
     font-family: 'Arial', sans-serif;
   }
   
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+  }
+
+  a {
+    text-decoration: none;
+    color: #f33535;
+  }
+
   .header {
     display: flex;
     justify-content: space-between;
@@ -79,12 +91,71 @@
     padding: 20px;
     border: 1px solid var(--primary-red);
   }
+  .post-container {
+    margin: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
   
   .post h2 {
-    color: var(--primary-red);
+    font-size: 24px;
+    font-weight: 700;
+  }
+  
+  .post p {
+    font-size: 18px;
+    line-height: 1.6;
+    margin: 10px 0;
+  }
+  
+  .post-actions {
+    margin-top: 20px;
+  }
+  
+  .post-actions button {
+    margin-right: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #f33535;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .post-actions button:hover {
+    background-color: #d12b2b;
+  }
+  
+  /* Comment section styling */
+  .comment-section {
+    margin-top: 30px;
+  }
+  
+  .comment {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+  }
+  
+  .comment textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .comment button {
+    padding: 8px 16px;
+    background-color: #f33535;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
   }
   
   button {
+    font-family: 'Montserrat', sans-serif;
     background-color: var(--primary-red);
     color: var(--light-grey);
     border: none;
