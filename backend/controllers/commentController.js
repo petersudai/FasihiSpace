@@ -35,3 +35,53 @@ exports.addComment = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+// Update a comment
+exports.updateComment = async (req, res) => {
+  const { body } = req.body;
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+
+    if (!comment) {
+      return res.status(404).json({ msg: 'Comment not found' });
+    }
+
+    // Check if the comment belongs to the logged-in user
+    if (comment.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'User not authorized' });
+    }
+
+    comment.body = body;
+    await comment.save();
+
+    res.json(comment);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+
+// Delete a comment
+exports.deleteComment = async (req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+
+    if (!comment) {
+      return res.status(404).json({ msg: 'Comment not found' });
+    }
+
+    // Check if the comment belongs to the logged-in user
+    if (comment.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'User not authorized' });
+    }
+
+    await comment.deleteOne();
+    res.json({ msg: 'Comment removed' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+
