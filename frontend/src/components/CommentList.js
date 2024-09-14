@@ -1,36 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import CommentItem from './CommentItem';
 
-function CommentList({ postId, token }) {
+function CommentList({ postId, token, userId }) {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (postId) {
-      const fetchComments = async () => {
-        try {
-          const res = await axios.get(`${process.env.REACT_APP_API_URL}/comments/${postId}`);
-          setComments(res.data);
-        } catch (err) {
-          console.error(err);
-        }
-      };
+    const fetchComments = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/comments/${postId}`);
+        setComments(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-      fetchComments();
-    }
+    fetchComments();
   }, [postId]);
 
+  // Handle adding a new comment
   const handleAddComment = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_API_URL}/comments`,
         { postId, body: newComment },
         { headers: { 'x-auth-token': token } }
       );
-      setComments([...comments, res.data]);
+
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/comments/${postId}`);
+      setComments(res.data);
       setNewComment('');
     } catch (err) {
       setError('Error adding comment.');
@@ -38,18 +40,18 @@ function CommentList({ postId, token }) {
     }
   };
 
-  if (!postId) return <p>Loading comments...</p>;  // Show loading if postId is not available
-
   return (
     <div className="comment-section">
       <h3>Comments</h3>
       {comments.length > 0 ? (
         comments.map(comment => (
-          <div key={comment._id} className="comment">
-            <strong>{comment.user.name}</strong>
-            <p>{comment.body}</p>
-            <small>{new Date(comment.date).toLocaleDateString()}</small>
-          </div>
+          <CommentItem
+            key={comment._id}
+            comment={comment}
+            token={token}
+            userId={userId}
+            setComments={setComments}
+          />
         ))
       ) : (
         <p>No comments yet. Be the first to comment!</p>

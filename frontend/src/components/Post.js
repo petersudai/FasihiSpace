@@ -72,7 +72,7 @@ function Post({ token, user }) {
       </div>
 
       {/* Comments Section */}
-      {post._id && <CommentList postId={post._id} token={token} />}
+      <CommentList postId={post._id} token={token} userId={user ? user._id : null} />
     </div>
   );
 }

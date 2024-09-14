@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import PostList from './components/PostList';
@@ -14,14 +14,42 @@ function App() {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
 
+  // Load token and user data from localStorage when the component mounts
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  // Handle login, saving token and user data to localStorage
   const handleLogin = (userData, authToken) => {
     setToken(authToken);
     setUser(userData);
+    localStorage.setItem('token', authToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
+
+  // Handle logout, clearing token and user data from state and localStorage
+  const handleLogout = () => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   };
 
   return (
     <Router>
-      <Header isLoggedIn={!!token} setIsLoggedIn={setToken} user={user} setToken={setToken} />
+      <Header 
+        isLoggedIn={!!token} 
+        setIsLoggedIn={setToken} 
+        user={user} 
+        setToken={setToken} 
+        handleLogout={handleLogout}  // Pass logout handler to Header
+      />
       <Routes>
         <Route path="/" element={<PostList />} />
         <Route path="/login" element={<LoginForm handleLogin={handleLogin} />} />
