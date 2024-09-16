@@ -28,9 +28,9 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
-
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/comments', require('./routes/comment'));
+app.use('/api/likes', require('./routes/likes'));
 
 // Test route for debugging CORS
 app.get('/test', (req, res) => {

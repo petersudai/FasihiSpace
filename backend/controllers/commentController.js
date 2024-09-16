@@ -1,5 +1,6 @@
 const Comment = require('../models/Comment');
 const Post = require('../models/Post');
+const mongoose = require('mongoose');
 
 // Get comments by post ID
 exports.getCommentsByPost = async (req, res) => {
@@ -17,6 +18,11 @@ exports.getCommentsByPost = async (req, res) => {
 // Add a new comment
 exports.addComment = async (req, res) => {
   const { postId, body } = req.body;
+
+  // Ensure postId is valid
+  if (!mongoose.Types.ObjectId.isValid(postId)) {
+    return res.status(400).json({ msg: 'Invalid post ID' });
+  }
 
   try {
     const post = await Post.findById(postId);

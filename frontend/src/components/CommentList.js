@@ -9,16 +9,18 @@ function CommentList({ postId, token, userId }) {
 
   useEffect(() => {
     const fetchComments = async () => {
-      try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/comments/${postId}`);
-        setComments(res.data);
-      } catch (err) {
-        console.error(err);
+      if (postId) { // Ensure postId is defined before making the request
+        try {
+          const res = await axios.get(`${process.env.REACT_APP_API_URL}/comments/${postId}`);
+          setComments(res.data);
+        } catch (err) {
+          console.error(err);
+        }
       }
     };
-
+  
     fetchComments();
-  }, [postId]);
+  }, [postId]);  
 
   // Handle adding a new comment
   const handleAddComment = async (e) => {
