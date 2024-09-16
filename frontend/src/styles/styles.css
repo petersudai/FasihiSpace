@@ -195,3 +195,30 @@
     font-size: 16px;
     color: var(--light-grey);
   }
+
+  .like-section {
+    display: flex;
+    align-items: center;
+  }
+  
+  .like-section button {
+    font-size: 1.2em;
+    cursor: pointer;
+    background: none;
+    border: none;
+    margin-right: 8px;
+  }
+  
+  .like-section button.liked {
+    color: red; /* Red color for liked posts */
+  }
+  
+  .like-section button:hover {
+    opacity: 0.7; /* Add hover effect */
+  }
+  
+  .like-section span {
+    font-size: 1em;
+    color: #333;
+  }
+  

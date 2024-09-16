@@ -7,6 +7,8 @@ function Post({ token, user }) {
   const { id } = useParams();
   const [post, setPost] = useState({});
   const [isOwner, setIsOwner] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,16 +30,69 @@ function Post({ token, user }) {
             setIsOwner(true);
           }
         }
+
+        // Fetch likes and check if the post is liked by the user
+        fetchLikes();
+        if (token) {
+          await checkIfLiked();
+        }
       } catch (err) {
         console.error(err);
       }
     };
 
+    const fetchLikes = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/likes/${id}`);
+        setLikesCount(res.data.likesCount);
+      } catch (err) {
+        console.error('Error fetching likes', err);
+      }
+    };
+
+    const checkIfLiked = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/likes/${id}/isLiked`, {
+          headers: { 'x-auth-token': token },
+        });
+        setIsLiked(res.data.isLiked);
+        console.log("Is the post liked by the user:", res.data.isLiked);
+      } catch (err) {
+        console.error('Error checking if liked', err.response?.data || err.message);
+        setIsLiked(false);
+      }
+    };
+
     fetchPost();
-  }, [id, user]);
+  }, [id, user, token]);
+
+  const handleLike = async () => {
+    if (!post._id) {
+      console.error("Post ID is undefined, cannot perform like action");
+      return;
+    }
+
+    try {
+      if (isLiked) {
+        await axios.delete(`${process.env.REACT_APP_API_URL}/likes/${id}`, {
+          headers: { 'x-auth-token': token },
+        });
+        setLikesCount(likesCount - 1);
+      } else {
+        // Liking the post
+        await axios.post(`${process.env.REACT_APP_API_URL}/likes/${id}`, {}, {
+          headers: { 'x-auth-token': token },
+        });
+        setLikesCount(likesCount + 1);
+      }
+      // Toggle the liked state
+      setIsLiked(!isLiked);
+    } catch (err) {
+      console.error('Error handling like/unlike:', err.response?.data || err.message);
+    }
+  };
 
   const handleDelete = async () => {
-    // Ask for confirmation before deleting
     const confirmDelete = window.confirm("Are you sure you want to delete this post?");
   
     if (confirmDelete) {
@@ -54,7 +109,7 @@ function Post({ token, user }) {
     }
   };
 
-  if (!post) return <p>Loading post...</p>; 
+  if (!post) return <p>Loading post...</p>;
 
   return (
     <div className="post-container">
@@ -62,6 +117,18 @@ function Post({ token, user }) {
         <h2>{post.title}</h2>
         <p>{post.body}</p>
         <small>Posted by {post.user ? post.user.name : 'Unknown'} on {new Date(post.date).toLocaleDateString()}</small>
+
+        {/* Likes Section */}
+        <div className="like-section" style={{ marginTop: '10px' }}>
+          <button 
+            onClick={handleLike} 
+            className={isLiked ? 'liked' : ''} 
+            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            {isLiked ? '❤️ Unlike' : '🤍 Like'}
+          </button>
+          <span style={{ marginLeft: '10px' }}>{likesCount} {likesCount === 1 ? 'Like' : 'Likes'}</span>
+        </div>
 
         {isOwner && (
           <div className="post-actions">
