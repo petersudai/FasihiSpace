@@ -1,5 +1,5 @@
 const express = require('express');
-const { createPost, getPosts, getPost, updatePost, deletePost } = require('../controllers/postController');
+const { createPost, getPosts, getPost, updatePost, deletePost, searchPosts } = require('../controllers/postController');
 const auth = require('../middleware/auth');  // JWT auth middleware
 const router = express.Router();
 
@@ -17,5 +17,8 @@ router.put('/:id', auth, updatePost);
 
 // Delete a blog post (Only the owner can delete)
 router.delete('/:id', auth, deletePost);
+
+// Search and filter posts
+router.get('/search', searchPosts);
 
 module.exports = router;

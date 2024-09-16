@@ -94,3 +94,49 @@ exports.deletePost = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+// Search and Filter posts
+exports.searchPosts = async (req, res) => {
+  const { title, content, author, date, tags, sortBy } = req.query;
+
+  const query = {};
+
+  // Build query based on ssearch parameter
+  if (title) {
+    query.title = { $regex: title, $options: 'i'};
+  }
+
+  if (content) {
+    query.body = { $regex: content, $options: 'i'};
+  }
+
+  if (author) {
+    const authorRegex = new RegExp (author, 'i');
+    query['user.name'] = authorRegex
+  }
+  
+  // Filtering
+  if (tags) {
+    query.tags = { $in: tags.split(',') };;
+  }
+
+  if (date) {
+    query.date = { $gte: new Date(date) };
+  }
+
+  // Sort by 'date' or 'likes'
+  let sort = {};
+  if (sortBy === 'most_popular') {
+    sort = { likes: -1 }; // Sort by most likes
+  } else if (sortBy === 'date') {
+    sort = { date: -1 }; // Sort by most recent date
+  }
+
+  try {
+    const posts = await Post.find(query).sort(sort);
+    res.json(posts);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
