@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import CommentList from './CommentList';
-import ReactMarkdown from 'react-markdown';  // Import ReactMarkdown
-import remarkGfm from 'remark-gfm';  // Optional, to support GitHub-flavored markdown (e.g., tables, strikethroughs, etc.)
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 function Post({ token, user }) {
   const { id } = useParams();
@@ -113,7 +113,7 @@ function Post({ token, user }) {
         {/* Display the post image */}
         {post.titleImage && (
           <img 
-            src={`${process.env.REACT_APP_API_URL}${post.titleImage}`}
+            src={`${process.env.REACT_APP_API_URL.replace('/api', '')}${post.titleImage}` }
             alt={post.title} 
             style={{ maxWidth: '100%', height: 'auto' }}
           />

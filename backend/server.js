@@ -1,7 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
-const cors = require('cors'); // Import CORS middleware
+const cors = require('cors');
 const path = require('path');
 
 dotenv.config();
@@ -26,13 +26,16 @@ app.options('*', cors(corsOptions));
 // Middleware to parse JSON requests
 app.use(express.json());
 
+// Serve static files from the "uploads" folder
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/comments', require('./routes/comment'));
 app.use('/api/likes', require('./routes/likes'));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // To handle large request bodies
 app.use(express.json({ limit: '10mb' }));

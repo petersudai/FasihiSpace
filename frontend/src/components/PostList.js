@@ -4,16 +4,15 @@ import { Link } from 'react-router-dom';
 
 function PostList() {
   const [posts, setPosts] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(''); // Track search input
-  const [filteredPosts, setFilteredPosts] = useState([]); // Store filtered results
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredPosts, setFilteredPosts] = useState([]);
 
   useEffect(() => {
-    // Fetch all posts initially
     const fetchPosts = async () => {
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/posts`);
         setPosts(res.data);
-        setFilteredPosts(res.data); // Set both posts and filteredPosts initially
+        setFilteredPosts(res.data);
       } catch (err) {
         console.error('Error fetching posts', err);
       }
@@ -23,7 +22,6 @@ function PostList() {
   }, []);
 
   useEffect(() => {
-    // Filter posts when searchQuery changes
     const filtered = posts.filter(post =>
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.body.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -33,11 +31,11 @@ function PostList() {
   }, [searchQuery, posts]);
 
   const handleSearch = (e) => {
-    setSearchQuery(e.target.value); // Update search query
+    setSearchQuery(e.target.value);
   };
 
   return (
-    <div className="post-list">
+    <div className="post-list" style={styles.postList}>
       <h2>Blog Posts</h2>
 
       {/* Search Bar */}
@@ -47,25 +45,32 @@ function PostList() {
           placeholder="Search blog posts by title, content or author..."
           value={searchQuery}
           onChange={handleSearch}
-          style={{ width: '36%', padding: '10px', fontSize: '14px', marginBottom: '20px' }}
+          style={styles.searchBar}
         />
       </div>
 
       {filteredPosts.length > 0 ? (
         filteredPosts.map((post) => (
-          <div key={post._id} className="post">
-            <Link to={`/posts/${post._id}`}>
-              {/* Render the title image if it exists */}
-              {post.titleImage && (
-                <img
-                  src={`${process.env.REACT_APP_API_URL}${post.titleImage}`}
-                  alt={post.title}
-                  style={{ maxWidth: '100%', height: 'auto' }}
-                />
-              )}
-              <h3>{post.title}</h3>
-            </Link>
-            <p>{post.body.substring(0, 100)}...</p>
+          <div key={post._id} className="post" style={styles.postContainer}>
+            
+            {/* Image on the left */}
+            {post.titleImage && (
+              <img 
+                src={`${process.env.REACT_APP_API_URL.replace('/api', '')}${post.titleImage}`} 
+                alt={post.title} 
+                style={styles.postImage}
+              />
+            )}
+
+            {/* Post content on the right */}
+            <div style={styles.postContent}>
+              <Link to={`/posts/${post._id}`} style={styles.postTitle}>
+                {post.title}
+              </Link>
+              <p style={styles.postBody}>
+                {post.body.substring(0, 100)}...
+              </p>
+            </div>
           </div>
         ))
       ) : (
@@ -74,5 +79,46 @@ function PostList() {
     </div>
   );
 }
+
+const styles = {
+  postList: {
+    margin: '0 auto',
+    maxWidth: '800px',
+  },
+  searchBar: {
+    width: '100%',
+    padding: '10px',
+    fontSize: '14px',
+    marginBottom: '20px',
+  },
+  postContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '20px',
+    borderBottom: '1px solid #ddd',
+    paddingBottom: '20px',
+  },
+  postImage: {
+    width: '150px',
+    height: '100px',
+    objectFit: 'cover',
+    borderRadius: '5px',
+    marginRight: '20px',
+  },
+  postContent: {
+    flex: 1,
+  },
+  postTitle: {
+    fontSize: '18px',
+    fontWeight: 'bold',
+    color: '#000',
+    textDecoration: 'none',
+    marginBottom: '10px',
+  },
+  postBody: {
+    fontSize: '14px',
+    color: '#000',
+  }
+};
 
 export default PostList;

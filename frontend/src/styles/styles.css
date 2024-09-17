@@ -89,7 +89,7 @@
     background-color: var(--dark-blue);
     margin-bottom: 20px;
     padding: 20px;
-    border: 1px solid var(--primary-red);
+    /* border: 1px solid var(--primary-red); */
   }
   .post-container {
     margin: 20px;
@@ -210,11 +210,11 @@
   }
   
   .like-section button.liked {
-    color: red; /* Red color for liked posts */
+    color: red;
   }
   
   .like-section button:hover {
-    opacity: 0.7; /* Add hover effect */
+    opacity: 0.7;
   }
   
   .like-section span {
@@ -224,7 +224,8 @@
   
   /* Search features */
   .search-bar {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    width: 90%;
   }
   
   .search-bar input {
