@@ -55,6 +55,14 @@ function PostList() {
         filteredPosts.map((post) => (
           <div key={post._id} className="post">
             <Link to={`/posts/${post._id}`}>
+              {/* Render the title image if it exists */}
+              {post.titleImage && (
+                <img
+                  src={`${process.env.REACT_APP_API_URL}${post.titleImage}`}
+                  alt={post.title}
+                  style={{ maxWidth: '100%', height: 'auto' }}
+                />
+              )}
               <h3>{post.title}</h3>
             </Link>
             <p>{post.body.substring(0, 100)}...</p>

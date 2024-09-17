@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const cors = require('cors'); // Import CORS middleware
+const path = require('path');
 
 dotenv.config();
 connectDB();
@@ -31,6 +32,11 @@ app.use('/api/posts', require('./routes/posts'));
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/comments', require('./routes/comment'));
 app.use('/api/likes', require('./routes/likes'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// To handle large request bodies
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Test route for debugging CORS
 app.get('/test', (req, res) => {
