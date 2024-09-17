@@ -1,19 +1,73 @@
 const Post = require('../models/Post');
+const multer = require('multer');
+const path = require('path');
+const TurndownService = require('turndown');
+const turndownService = new TurndownService();
+
+// Multer storage setup
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // the uploads folder
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg|jpg|png|webp|gif/;
+    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = fileTypes.test(file.mimetype);
+
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb('Error: Images Only!');
+    }
+  },
+  limits: { fileSize: 10 * 1024 * 1024 }  // 10 MB limit 
+});
 
 // Create a new blog post
-exports.createPost = async (req, res) => {
-  try {
-    const newPost = new Post({
-      user: req.user.id,
-      title: req.body.title,
-      body: req.body.body
-    });
-    const post = await newPost.save();
-    res.json(post);
-  } catch (err) {
-    res.status(500).send('Server error');
+exports.createPost = [
+  upload.single('image'),
+  async (req, res) => {
+    // Log incoming data
+    console.log(req.file);
+    console.log(req.body);
+
+    const { title, body } = req.body;
+
+    // Log for debugging
+    console.log('Received body:', body);
+    console.log('Received title:', title);
+    console.log('Received file:', req.file ? req.file.filename : 'No file uploaded');
+
+    // Convert HTML body to Markdown
+    const markdownBody = turndownService.turndown(body);
+
+    if (!title || !markdownBody) {
+      return res.status(400).json({ msg: 'Title and body are required' });
+    }
+
+    try {
+      const newPost = new Post({
+        user: req.user.id,
+        title,
+        body: markdownBody,
+        titleImage: req.file ? `/uploads/${req.file.filename}` : null
+      });
+
+      await newPost.save();
+      res.json(newPost);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+    }
   }
-};
+];
 
 // Get all blog posts
 exports.getPosts = async (req, res) => {
@@ -39,35 +93,31 @@ exports.getPost = async (req, res) => {
   }
 };
 
-// Update a blog post
-exports.updatePost = async (req, res) => {
-  try {
-    // Find the post by ID
-    let post = await Post.findById(req.params.id);
+// Update an existing post
+exports.editPost = [
+  upload.single('image'),
+  async (req, res) => {
+    const { title, body } = req.body;
 
-    // Check if the post exists
-    if (!post) {
-      return res.status(404).json({ msg: 'Post not found' });
+    try {
+      let post = await Post.findById(req.params.id);
+      if (!post) {
+        return res.status(404).json({ msg: 'Post not found' });
+      }
+
+      post.title = title;
+      post.body = body;
+      post.titleImage = req.file ? `/uploads/${req.file.filename}` : post.titleImage;
+
+      await post.save();
+      res.json(post);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
     }
-
-    // Check if the user requesting the update is the owner of the post
-    if (post.user.toString() !== req.user.id) {
-      return res.status(401).json({ msg: 'User not authorized' });
-    }
-
-    // Update the post content
-    post = await Post.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },  // Update with new data
-      { new: true }  // Return the updated post
-    );
-
-    res.json(post);  // Send the updated post back to the client
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
   }
-};
+];
+
 
 // Delete a blog post
 exports.deletePost = async (req, res) => {

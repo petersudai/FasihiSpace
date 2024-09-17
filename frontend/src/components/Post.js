@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import CommentList from './CommentList';
+import ReactMarkdown from 'react-markdown';  // Import ReactMarkdown
+import remarkGfm from 'remark-gfm';  // Optional, to support GitHub-flavored markdown (e.g., tables, strikethroughs, etc.)
 
 function Post({ token, user }) {
   const { id } = useParams();
@@ -16,10 +18,6 @@ function Post({ token, user }) {
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`);
         setPost(res.data);
-
-        // Log post and user data for debugging
-        console.log("Post data:", res.data);
-        console.log("Logged-in user data:", user);
 
         // Check if the logged-in user is the owner of the post
         if (res.data.user && res.data.user._id === user?._id) {
@@ -56,7 +54,6 @@ function Post({ token, user }) {
           headers: { 'x-auth-token': token },
         });
         setIsLiked(res.data.isLiked);
-        console.log("Is the post liked by the user:", res.data.isLiked);
       } catch (err) {
         console.error('Error checking if liked', err.response?.data || err.message);
         setIsLiked(false);
@@ -79,13 +76,11 @@ function Post({ token, user }) {
         });
         setLikesCount(likesCount - 1);
       } else {
-        // Liking the post
         await axios.post(`${process.env.REACT_APP_API_URL}/likes/${id}`, {}, {
           headers: { 'x-auth-token': token },
         });
         setLikesCount(likesCount + 1);
       }
-      // Toggle the liked state
       setIsLiked(!isLiked);
     } catch (err) {
       console.error('Error handling like/unlike:', err.response?.data || err.message);
@@ -114,8 +109,21 @@ function Post({ token, user }) {
   return (
     <div className="post-container">
       <div className="post">
+
+        {/* Display the post image */}
+        {post.titleImage && (
+          <img 
+            src={`${process.env.REACT_APP_API_URL}${post.titleImage}`}
+            alt={post.title} 
+            style={{ maxWidth: '100%', height: 'auto' }}
+          />
+        )}
+        
         <h2>{post.title}</h2>
-        <p>{post.body}</p>
+
+        {/* Use ReactMarkdown to render the post body */}
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.body}</ReactMarkdown>
+
         <small>Posted by {post.user ? post.user.name : 'Unknown'} on {new Date(post.date).toLocaleDateString()}</small>
 
         {/* Likes Section */}
