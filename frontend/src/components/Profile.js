@@ -4,6 +4,7 @@ import axios from 'axios';
 
 function Profile({ token }) {
   const [posts, setPosts] = useState([]);
+  const [readPosts, setReadPosts] = useState([]); // User's read posts
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,7 +15,7 @@ function Profile({ token }) {
     // Fetch user profile
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/profile`, {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/profile/basic-info`, {
           headers: { 'x-auth-token': token }
         });
         setFormData({
@@ -39,8 +40,23 @@ function Profile({ token }) {
       }
     };
 
+    // Fetch user's read posts
+    const fetchReadPosts = async () => {
+      try {
+        console.log('Fetching read posts...');
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/profile/read-posts`, {
+          headers: { 'x-auth-token': token }
+        });
+        console.log('Read posts response:', res.data);
+        setReadPosts(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
     fetchProfile();
     fetchUserPosts();
+    fetchReadPosts();
   }, [token]);
 
   // Handle form submit for updating profile
@@ -82,17 +98,40 @@ function Profile({ token }) {
         <button type="submit">Update Profile</button>
       </form>
 
+      {/* Section for User's Own Posts */}
       <h3>My Posts</h3>
       <ul>
-        {posts.map((post) => (
-          <li key={post._id}>
-            <Link to={`/posts/${post._id}`}>
-              <strong>{post.title}</strong> {/* Clicking this will take the user to the post */}
-            </Link>
-            <p>{post.body.slice(0, 100)}... <Link to={`/posts/${post._id}`}>Read more</Link></p>
-            <small>Posted on: {new Date(post.date).toLocaleDateString()}</small>
-          </li>
-        ))}
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <li key={post._id}>
+              <Link to={`/posts/${post._id}`}>
+                <strong>{post.title}</strong>
+              </Link>
+              <p>{post.body.slice(0, 100)}... <Link to={`/posts/${post._id}`}>Read more</Link></p>
+              <small>Posted on: {new Date(post.date).toLocaleDateString()}</small>
+            </li>
+          ))
+        ) : (
+          <p>You haven't created any posts yet.</p>
+        )}
+      </ul>
+
+      {/* Section for Read Posts */}
+      <h3>Posts You've Read</h3>
+      <ul>
+        {readPosts.length > 0 ? (
+          readPosts.map((post) => (
+            <li key={post._id}>
+              <Link to={`/posts/${post._id}`}>
+                <strong>{post.title}</strong>
+              </Link>
+              <p>{post.body.slice(0, 100)}... <Link to={`/posts/${post._id}`}>Read more</Link></p>
+              <small>Posted on: {new Date(post.date).toLocaleDateString()}</small>
+            </li>
+          ))
+        ) : (
+          <p>You haven't read any posts yet.</p>
+        )}
       </ul>
     </div>
   );

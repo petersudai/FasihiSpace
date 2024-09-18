@@ -36,7 +36,6 @@ app.use('/api/profile', require('./routes/profile'));
 app.use('/api/comments', require('./routes/comment'));
 app.use('/api/likes', require('./routes/likes'));
 
-
 // To handle large request bodies
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));

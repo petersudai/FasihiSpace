@@ -132,6 +132,7 @@
   /* Comment section styling */
   .comment-section {
     margin-top: 30px;
+    color: black;
   }
   
   .comment {
@@ -202,7 +203,7 @@
   }
   
   .like-section button {
-    font-size: 1.2em;
+    font-size: 1em;
     cursor: pointer;
     background: none;
     border: none;
@@ -219,7 +220,7 @@
   
   .like-section span {
     font-size: 1em;
-    color: #333;
+    color: #4e0303;
   }
   
   /* Search features */
@@ -251,3 +252,24 @@
     padding-bottom: 10px;
   }
    
+  .profile-page {
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  .posts-list {
+    margin-bottom: 40px;
+  }
+  
+  .post {
+    margin-bottom: 20px;
+  }
+  
+  .post h3 {
+    font-size: 1.5rem;
+  }
+  
+  .post p {
+    color: #666;
+  }
+  

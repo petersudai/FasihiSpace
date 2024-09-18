@@ -44,8 +44,47 @@ exports.updateProfile = async (req, res) => {
 // Get posts created by the user
 exports.getUserPosts = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(400).json({ msg: 'User is not authenticated' });
+    }
+
     const posts = await Post.find({ user: req.user.id }); // Fetch all posts by the user
     res.json(posts);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+// Fetch user's posts and read posts
+exports.getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate('posts').populate('readPosts');
+    
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    const ownPosts = user.posts;
+    const readPosts = user.readPosts;
+
+    res.json({ ownPosts, readPosts });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+// Get the user's read posts
+exports.getReadPosts = async (req, res) => {
+  try {
+    // Populate the user's read posts
+    const user = await User.findById(req.user.id).populate('readPosts');
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    console.log('Returning read posts:', user.readPosts);
+    res.json(user.readPosts); // Return the read posts
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

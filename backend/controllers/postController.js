@@ -1,4 +1,5 @@
 const Post = require('../models/Post');
+const User = require('../models/User');
 const multer = require('multer');
 const path = require('path');
 const TurndownService = require('turndown');
@@ -80,15 +81,33 @@ exports.getPosts = async (req, res) => {
 };
 
 // Get a single post by ID
-exports.getPost = async (req, res) => {
+exports.getPostByID = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id).populate('user', ['name', '_id']);
     if (!post) {
       return res.status(404).json({ msg: 'Post not found' });
     }
+
+    console.log('Decoded user in getPostByID:', req.user);
+
+    // Ensure req.user exists before proceeding
+    if (req.user && req.user.id) {  
+      const user = await User.findById(req.user.id);
+      if (!user.readPosts.includes(post._id)) {
+        console.log('Adding post to readPosts:', post._id);
+        user.readPosts.push(post._id);
+        await user.save();
+        console.log('Updated user readPosts:', user.readPosts);
+      } else {
+        console.log('Post already in readPosts:', post._id);
+      }
+    } else {
+      console.log('No logged-in user, skipping readPosts tracking');
+    }
+
     res.json(post);
   } catch (err) {
-    console.error(err.message);
+    console.error('Error fetching post by ID:', err.message);
     res.status(500).send('Server error');
   }
 };
@@ -99,6 +118,8 @@ exports.editPost = [
   async (req, res) => {
     const { title, body } = req.body;
 
+    const markdownBody = turndownService.turndown(body);
+
     try {
       let post = await Post.findById(req.params.id);
       if (!post) {
@@ -106,7 +127,7 @@ exports.editPost = [
       }
 
       post.title = title;
-      post.body = body;
+      post.body = markdownBody;
       post.titleImage = req.file ? `/uploads/${req.file.filename}` : post.titleImage;
 
       await post.save();

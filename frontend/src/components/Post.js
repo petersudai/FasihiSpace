@@ -14,6 +14,15 @@ function Post({ token, user }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found, please log in');
+    } else {
+      // Add the token to axios default headers for all requests
+      axios.defaults.headers.common['x-auth-token'] = token;
+    }
+    
     const fetchPost = async () => {
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`);
