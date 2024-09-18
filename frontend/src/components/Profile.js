@@ -74,67 +74,143 @@ function Profile({ token }) {
   };
 
   return (
-    <div className="profile-page">
+    <div className="profile-page" style={styles.profilePage}>
       <h2>User Profile</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} style={styles.profileForm}>
         <label>Name:</label>
         <input
           type="text"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          style={styles.input}
         />
         <label>Email:</label>
         <input
           type="email"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          style={styles.input}
         />
         <label>Profile Picture URL:</label>
         <input
           type="text"
           value={formData.profilePicture}
           onChange={(e) => setFormData({ ...formData, profilePicture: e.target.value })}
+          style={styles.input}
         />
-        <button type="submit">Update Profile</button>
+        <button type="submit" style={styles.button}>Update Profile</button>
       </form>
 
       {/* Section for User's Own Posts */}
       <h3>My Posts</h3>
-      <ul>
+      <div className="user-posts" style={styles.postList}>
         {posts.length > 0 ? (
           posts.map((post) => (
-            <li key={post._id}>
-              <Link to={`/posts/${post._id}`}>
-                <strong>{post.title}</strong>
-              </Link>
-              <p>{post.body.slice(0, 100)}... <Link to={`/posts/${post._id}`}>Read more</Link></p>
-              <small>Posted on: {new Date(post.date).toLocaleDateString()}</small>
-            </li>
+            <div key={post._id} className="post" style={styles.postContainer}>
+              {post.titleImage && (
+                <img 
+                  src={`${process.env.REACT_APP_API_URL.replace('/api', '')}${post.titleImage}`} 
+                  alt={post.title} 
+                  style={styles.postImage}
+                />
+              )}
+              <div style={styles.postContent}>
+                <Link to={`/posts/${post._id}`} style={styles.postTitle}>
+                  {post.title}
+                </Link>
+                <p style={styles.postBody}>
+                  {post.body.substring(0, 100)}...
+                </p>
+              </div>
+            </div>
           ))
         ) : (
           <p>You haven't created any posts yet.</p>
         )}
-      </ul>
+      </div>
 
       {/* Section for Read Posts */}
       <h3>Posts You've Read</h3>
-      <ul>
+      <div className="read-posts" style={styles.postList}>
         {readPosts.length > 0 ? (
           readPosts.map((post) => (
-            <li key={post._id}>
-              <Link to={`/posts/${post._id}`}>
-                <strong>{post.title}</strong>
-              </Link>
-              <p>{post.body.slice(0, 100)}... <Link to={`/posts/${post._id}`}>Read more</Link></p>
-              <small>Posted on: {new Date(post.date).toLocaleDateString()}</small>
-            </li>
+            <div key={post._id} className="post" style={styles.postContainer}>
+              {post.titleImage && (
+                <img 
+                  src={`${process.env.REACT_APP_API_URL.replace('/api', '')}${post.titleImage}`} 
+                  alt={post.title} 
+                  style={styles.postImage}
+                />
+              )}
+              <div style={styles.postContent}>
+                <Link to={`/posts/${post._id}`} style={styles.postTitle}>
+                  {post.title}
+                </Link>
+                <p style={styles.postBody}>
+                  {post.body.substring(0, 100)}...
+                </p>
+              </div>
+            </div>
           ))
         ) : (
           <p>You haven't read any posts yet.</p>
         )}
-      </ul>
+      </div>
     </div>
   );
 }
+
+const styles = {
+  profilePage: {
+    margin: '0 auto',
+    maxWidth: '800px',
+  },
+  profileForm: {
+    marginBottom: '20px',
+  },
+  input: {
+    width: '100%',
+    padding: '10px',
+    marginBottom: '10px',
+    fontSize: '14px',
+  },
+  button: {
+    padding: '10px 15px',
+    fontSize: '14px',
+    cursor: 'pointer',
+  },
+  postList: {
+    margin: '0 auto',
+    maxWidth: '800px',
+  },
+  postContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '20px',
+    borderBottom: '1px solid #ddd',
+    paddingBottom: '20px',
+  },
+  postImage: {
+    width: '150px',
+    height: '100px',
+    objectFit: 'cover',
+    borderRadius: '5px',
+    marginRight: '20px',
+  },
+  postContent: {
+    flex: 1,
+  },
+  postTitle: {
+    fontSize: '18px',
+    fontWeight: 'bold',
+    color: '#000',
+    textDecoration: 'none',
+    marginBottom: '10px',
+  },
+  postBody: {
+    fontSize: '14px',
+    color: '#000',
+  },
+};
 
 export default Profile;
