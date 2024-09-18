@@ -7,24 +7,29 @@ exports.registerUser = async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
+    // Validate incoming request
+    if (!name || !email || !password) {
+      return res.status(400).json({ msg: 'Please provide all required fields' });
+    }
+
     // Check if the user already exists
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ msg: 'User already exists' });
     }
 
-    // Create a new user
+    // Create a new user instance
     user = new User({
       name,
       email,
       password,
     });
 
-    // Hash the password
+    // Hash the password using bcrypt
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
 
-    // Save the user
+    // Save the user to the database
     await user.save();
 
     // Create JWT payload
@@ -34,10 +39,13 @@ exports.registerUser = async (req, res) => {
       },
     };
 
-    // Sign JWT token and return it
-    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 }, (err, token) => {
+    // Sign the JWT token and return it
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
       if (err) throw err;
-      res.json({ token });
+      res.status(201).json({
+        token,
+        user: { _id: user._id, name: user.name, email: user.email }, // Returning user info along with token
+      });
     });
   } catch (err) {
     console.error(err.message);
@@ -50,13 +58,18 @@ exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Validate incoming request
+    if (!email || !password) {
+      return res.status(400).json({ msg: 'Please provide both email and password' });
+    }
+
     // Check if the user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
-    // Check if the password matches
+    // Compare password with the stored hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ msg: 'Invalid credentials' });
@@ -66,11 +79,11 @@ exports.loginUser = async (req, res) => {
     const payload = {
       user: {
         id: user.id,
-        name: user.name,  // Including user's name in the JWT payload
+        name: user.name,
       },
     };
 
-    // Sign the JWT token and return it with the full user object
+    // Sign the JWT token and return it
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
@@ -92,8 +105,23 @@ exports.loginUser = async (req, res) => {
 // Fetch all users (new method)
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}, 'name email');  // Fetch only the 'name' and 'email' fields
+    const users = await User.find({}, 'name email');
     res.json(users);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+// Fetch the current authenticated user (new method)
+exports.getAuthenticatedUser = async (req, res) => {
+  try {
+    // The user is already authenticated, so we fetch the user data using req.user.id
+    const user = await User.findById(req.user.id).select('-password');  // Exclude password
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    res.json(user);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
