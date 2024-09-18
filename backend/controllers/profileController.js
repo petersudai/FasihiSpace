@@ -78,15 +78,22 @@ exports.getUserProfile = async (req, res) => {
 // Get the user's read posts
 exports.getReadPosts = async (req, res) => {
   try {
-    // Populate the user's read posts
-    const user = await User.findById(req.user.id).populate('readPosts');
+    // Fetch the user and populate the readPosts field
+    const user = await User.findById(req.user.id).populate({
+      path: 'readPosts',
+      populate: { path: 'user', select: 'name' }  // Populate the author of the post
+    });
+
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
-    console.log('Returning read posts:', user.readPosts);
-    res.json(user.readPosts); // Return the read posts
+
+    // Filter out the posts written by the user
+    const filteredReadPosts = user.readPosts.filter(post => post.user._id.toString() !== req.user.id);
+
+    res.json(filteredReadPosts);
   } catch (err) {
-    console.error(err.message);
+    console.error('Error fetching read posts:', err.message);
     res.status(500).send('Server error');
   }
 };
