@@ -86,38 +86,97 @@ function PostForm({ token }) {
   };
 
   return (
-    <div className="post-form-container">
-      <h2>{isEditing ? 'Edit Post' : 'Create New Post'}</h2>
-      <form onSubmit={handleSubmit}>
+    <>
+      <style>
+        {`
+          .post-form-container {
+            margin: 0 auto;
+            max-width: 800px;
+            background-color: #7e8c8d;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            color: #000;
+          }
 
-        {/* Title Input */}
-        <input 
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter the title"
-          required
-        />
+          .post-form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #000; /* Dark blue */
+          }
 
-        {/* React Quill Editor */}
-        <ReactQuill 
-          ref={quillRef}
-          value={body}
-          onChange={setBody}
-          modules={modules}
-          placeholder="Write your blog content here..."
-        />
+          .post-form-container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            color: #000;
+          }
 
-        {/* Image Input */}
-        <input
-          type="file"
-          onChange={(e) => setImage(e.target.files[0])}
-          accept="image/*"
-        />
+          .post-form-container input[type="text"]:focus {
+            border-color: #F33535; /* Primary red */
+            outline: none;
+          }
 
-        <button type="submit">{isEditing ? 'Update Post' : 'Create Post'}</button>
-      </form>
-    </div>
+          .post-form-container input[type="file"] {
+            margin-bottom: 20px;
+          }
+
+          .post-form-container button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #F33535; /* Primary red */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+          }
+
+          .post-form-container button:hover {
+            background-color: #D92525;
+          }
+        `}
+      </style>
+
+      <div className="post-form-container">
+        <h2>{isEditing ? 'Edit Post' : 'Create New Post'}</h2>
+        <form onSubmit={handleSubmit}>
+
+          {/* Title Input */}
+          <input 
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter the title"
+            required
+          />
+
+          {/* React Quill Editor */}
+          <ReactQuill 
+            ref={quillRef}
+            value={body}
+            onChange={setBody}
+            modules={modules}
+            placeholder="Write your blog content here..."
+          />
+
+          {/* Image Input */}
+          <input
+            type="file"
+            onChange={(e) => setImage(e.target.files[0])}
+            accept="image/*"
+          />
+
+          <button type="submit">{isEditing ? 'Update Post' : 'Create Post'}</button>
+        </form>
+      </div>
+    </>
   );
 }
 
