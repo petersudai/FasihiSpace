@@ -1,7 +1,7 @@
 :root {
     --primary-red: #F33535;
     --light-grey: #D8E9F0;
-    --dark-blue: #33425B;
+    --dark-blue: #7e8c8d;
     --black: #29252C;
   }
   
@@ -105,9 +105,10 @@
   }
   
   .post p {
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1.6;
     margin: 10px 0;
+    color: rgb(0, 0, 0);
   }
   
   .post-actions {
@@ -226,7 +227,7 @@
   /* Search features */
   .search-bar {
     margin-bottom: 10px;
-    width: 90%;
+    max-width: 800px;
   }
   
   .search-bar input {
@@ -270,6 +271,7 @@
   }
   
   .post p {
-    color: #666;
+    color: #d1d1d1;
+    font-size: 15px;
   }
   

@@ -34,7 +34,11 @@ function PostForm({ token }) {
   useEffect(() => {
     if (id) {
       // Fetch post if editing
-      axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`)
+      axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`, {
+        headers: {
+          'x-auth-token': token,
+        }
+      })
         .then((res) => {
           setTitle(res.data.title);
           setBody(res.data.body);
@@ -42,10 +46,13 @@ function PostForm({ token }) {
         })
         .catch((err) => console.error(err));
     }
-  }, [id]);
+  }, [id, token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Log the token being sent in headers
+    console.log('Token being sent in headers:', token);
 
     const formData = new FormData();
     formData.append('title', title);
@@ -53,9 +60,6 @@ function PostForm({ token }) {
     // Convert the HTML from ReactQuill to Markdown using Turndown
     const markdownBody = turndownService.turndown(body);
     formData.append('body', markdownBody);
-
-    console.log('Title:', title);
-    console.log('Body (Markdown):', markdownBody);
 
     // Check if the image is selected
     if (image) {
@@ -69,9 +73,12 @@ function PostForm({ token }) {
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'x-auth-token': token
-        }
+          'x-auth-token': token,
+        },
       };
+
+      console.log('Form Data:', formData);
+      console.log('Config:', config);
 
       if (isEditing) {
         await axios.put(`${process.env.REACT_APP_API_URL}/posts/${id}`, formData, config);
@@ -81,43 +88,102 @@ function PostForm({ token }) {
 
       navigate('/');
     } catch (err) {
-      console.error('Error submitting form', err);
+      console.error('Error submitting form:', err);
     }
   };
 
   return (
-    <div className="post-form-container">
-      <h2>{isEditing ? 'Edit Post' : 'Create New Post'}</h2>
-      <form onSubmit={handleSubmit}>
+    <>
+      <style>
+        {`
+          .post-form-container {
+            margin: 0 auto;
+            max-width: 800px;
+            background-color: #7e8c8d;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            color: #000;
+          }
 
-        {/* Title Input */}
-        <input 
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter the title"
-          required
-        />
+          .post-form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #000;
+          }
 
-        {/* React Quill Editor */}
-        <ReactQuill 
-          ref={quillRef}
-          value={body}
-          onChange={setBody}
-          modules={modules}
-          placeholder="Write your blog content here..."
-        />
+          .post-form-container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            color: #000;
+          }
 
-        {/* Image Input */}
-        <input
-          type="file"
-          onChange={(e) => setImage(e.target.files[0])}
-          accept="image/*"
-        />
+          .post-form-container input[type="text"]:focus {
+            border-color: #F33535;
+            outline: none;
+          }
 
-        <button type="submit">{isEditing ? 'Update Post' : 'Create Post'}</button>
-      </form>
-    </div>
+          .post-form-container input[type="file"] {
+            margin-bottom: 20px;
+          }
+
+          .post-form-container button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #F33535;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+          }
+
+          .post-form-container button:hover {
+            background-color: #D92525;
+          }
+        `}
+      </style>
+
+      <div className="post-form-container">
+        <h2>{isEditing ? 'Edit Post' : 'Create New Post'}</h2>
+        <form onSubmit={handleSubmit}>
+
+          {/* Title Input */}
+          <input 
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter the title"
+            required
+          />
+
+          {/* React Quill Editor */}
+          <ReactQuill 
+            ref={quillRef}
+            value={body}
+            onChange={setBody}
+            modules={modules}
+            placeholder="Write your blog content here..."
+          />
+
+          {/* Image Input */}
+          <input
+            type="file"
+            onChange={(e) => setImage(e.target.files[0])}
+            accept="image/*"
+          />
+
+          <button type="submit">{isEditing ? 'Update Post' : 'Create Post'}</button>
+        </form>
+      </div>
+    </>
   );
 }
 

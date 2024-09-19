@@ -1,6 +1,6 @@
+const connectDB = require('./config/db');
 const express = require('express');
 const dotenv = require('dotenv');
-const connectDB = require('./config/db');
 const cors = require('cors');
 const path = require('path');
 
@@ -26,6 +26,10 @@ app.options('*', cors(corsOptions));
 // Middleware to parse JSON requests
 app.use(express.json());
 
+// To handle large request bodies
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
 // Serve static files from the "uploads" folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -35,10 +39,6 @@ app.use('/api/posts', require('./routes/posts'));
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/comments', require('./routes/comment'));
 app.use('/api/likes', require('./routes/likes'));
-
-// To handle large request bodies
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Test route for debugging CORS
 app.get('/test', (req, res) => {
