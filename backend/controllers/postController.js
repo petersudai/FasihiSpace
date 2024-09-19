@@ -85,8 +85,11 @@ exports.getPostByID = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id).populate('user', ['name', '_id']);
     if (!post) {
+      console.log('Post not found');
       return res.status(404).json({ msg: 'Post not found' });
     }
+
+    console.log('Post found:', post);
 
     console.log('Decoded user in getPostByID:', req.user);
 
@@ -118,12 +121,23 @@ exports.editPost = [
   async (req, res) => {
     const { title, body } = req.body;
 
+    console.log('User editing post:', req.user);
+    console.log('Request body:', req.body);
+
     const markdownBody = turndownService.turndown(body);
 
     try {
       let post = await Post.findById(req.params.id);
       if (!post) {
         return res.status(404).json({ msg: 'Post not found' });
+      }
+
+      console.log('Post found:', post);
+
+      // Check if the logged-in user owns the post
+      if (post.user.toString() !== req.user.id) {
+        console.log('User not authorized to edit this post');
+        return res.status(401).json({ msg: 'User not authorized' });
       }
 
       post.title = title;

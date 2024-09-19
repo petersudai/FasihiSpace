@@ -7,27 +7,26 @@ import remarkGfm from 'remark-gfm';
 
 function Post({ token, user }) {
   const { id } = useParams();
-  const [post, setPost] = useState({});
+  const [post, setPost] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('No token found, please log in');
-    } else {
-      axios.defaults.headers.common['x-auth-token'] = token;
-    }
-
     const fetchPost = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`,  {
+          headers: {
+            'x-auth-token': token,
+          },
+        });
+        console.log('Token being sent:', token);
+        console.log('Post fetched:', res.data);
         setPost(res.data);
 
         // Check if the logged-in user is the owner of the post
-        if (res.data.user && res.data.user._id === user?._id) {
+        if (user && res.data.user && res.data.user._id === user._id) {
           setIsOwner(true);
         }
 
@@ -36,7 +35,7 @@ function Post({ token, user }) {
           await checkIfLiked();
         }
       } catch (err) {
-        console.error(err);
+        console.error('Error fetching post:', err);
       }
     };
 
@@ -45,16 +44,19 @@ function Post({ token, user }) {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/likes/${id}`);
         setLikesCount(res.data.likesCount);
       } catch (err) {
-        console.error('Error fetching likes', err);
+        console.error('Error fetching likes:', err);
       }
     };
 
     const checkIfLiked = async () => {
+      if (!token) return;
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/likes/${id}/isLiked`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/likes/${id}/isLiked`, {
+          headers: { 'x-auth-token': token },
+        });
         setIsLiked(res.data.isLiked);
       } catch (err) {
-        console.error('Error checking if liked', err.response?.data || err.message);
+        console.error('Error checking if liked:', err);
         setIsLiked(false);
       }
     };
@@ -63,22 +65,23 @@ function Post({ token, user }) {
   }, [id, user, token]);
 
   const handleLike = async () => {
-    if (!post._id) {
-      console.error("Post ID is undefined, cannot perform like action");
-      return;
-    }
+    if (!post._id) return; // Prevent action if post not loaded
 
     try {
       if (isLiked) {
-        await axios.delete(`${process.env.REACT_APP_API_URL}/likes/${id}`);
+        await axios.delete(`${process.env.REACT_APP_API_URL}/likes/${id}`, {
+          headers: { 'x-auth-token': token },
+        });
         setLikesCount(likesCount - 1);
       } else {
-        await axios.post(`${process.env.REACT_APP_API_URL}/likes/${id}`);
+        await axios.post(`${process.env.REACT_APP_API_URL}/likes/${id}`, {}, {
+          headers: { 'x-auth-token': token },
+        });
         setLikesCount(likesCount + 1);
       }
       setIsLiked(!isLiked);
     } catch (err) {
-      console.error('Error handling like/unlike:', err.response?.data || err.message);
+      console.error('Error handling like/unlike:', err);
     }
   };
 
@@ -86,10 +89,12 @@ function Post({ token, user }) {
     const confirmDelete = window.confirm('Are you sure you want to delete this post?');
     if (confirmDelete) {
       try {
-        await axios.delete(`${process.env.REACT_APP_API_URL}/posts/${id}`);
+        await axios.delete(`${process.env.REACT_APP_API_URL}/posts/${id}`, {
+          headers: { 'x-auth-token': token },
+        });
         navigate('/');
       } catch (err) {
-        console.error(err);
+        console.error('Error deleting post:', err);
       }
     }
   };
@@ -204,15 +209,21 @@ function Post({ token, user }) {
 
           <small>
             Posted by {post.user ? post.user.name : 'Unknown'} on{' '}
-            {new Date(post.date).toLocaleDateString()}
+            {post.date ? new Date(post.date).toLocaleDateString() : 'Unknown Date'}
           </small>
 
           {/* Likes Section */}
           <div className="like-section">
-            <button onClick={handleLike} className={isLiked ? 'liked' : ''}>
-              {isLiked ? '❤️ Unlike' : '🤍 Like'}
-            </button>
-            <span>{likesCount} {likesCount === 1 ? 'Like' : 'Likes'}</span>
+            {token ? (
+              <>
+                <button onClick={handleLike} className={isLiked ? 'liked' : ''}>
+                  {isLiked ? '❤️ Unlike' : '🤍 Like'}
+                </button>
+                <span>{likesCount} {likesCount === 1 ? 'Like' : 'Likes'}</span>
+              </>
+            ) : (
+              <p>{likesCount} {likesCount === 1 ? 'Like' : 'Likes'}</p>
+            )}
           </div>
 
           {isOwner && (

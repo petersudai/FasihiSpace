@@ -7,8 +7,12 @@ function Header({ isLoggedIn, setIsLoggedIn, setToken, user }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    setToken(null);
+    // Clear token from localStorage
+    localStorage.removeItem('token');
+
     setIsLoggedIn(false);
+    setToken(null);
+    
     navigate('/login');
   };
 

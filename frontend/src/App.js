@@ -19,6 +19,8 @@ function App() {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
 
+    console.log('Stored token:', storedToken);
+
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
@@ -48,17 +50,22 @@ function App() {
         setIsLoggedIn={setToken} 
         user={user} 
         setToken={setToken} 
-        handleLogout={handleLogout}  // Pass logout handler to Header
+        handleLogout={handleLogout}
       />
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<PostList />} />
-        <Route path="/login" element={<LoginForm handleLogin={handleLogin} />} />
-        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/posts/:id" element={<Post token={token} user={user} />} />
+
+        {/* Authentication routes */}
+        <Route path="/login" element={token ? <Navigate to="/" /> : <LoginForm handleLogin={handleLogin} />} />
+        <Route path="/register" element={token ? <Navigate to="/" /> : <RegisterForm />} />
+
+        {/* Protected routes for logged-in users */}
         <Route path="/create" element={token ? <PostForm token={token} /> : <Navigate to="/login" />} />
         <Route path="/edit/:id" element={token ? <PostForm token={token} /> : <Navigate to="/login" />} />
-        <Route path="/posts/:id" element={<Post token={token} user={user} />} />
-        <Route path="/users" element={<UsersPage />} />
         <Route path="/profile" element={token ? <Profile token={token} user={user} /> : <Navigate to="/login" />} />
+        <Route path="/users" element={token ? <UsersPage /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );

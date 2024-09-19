@@ -12,6 +12,8 @@ function LoginForm({ handleLogin }) {
     e.preventDefault();
 
     try {
+      console.log('Login data:', { email, password });
+      
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
         email,
         password,
@@ -22,7 +24,7 @@ function LoginForm({ handleLogin }) {
       navigate('/');
     } catch (err) {
       setError('Invalid credentials, please try again.');
-      console.error(err);
+      console.error(err.response?.data || err.message);
     }
   };
 

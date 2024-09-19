@@ -34,7 +34,11 @@ function PostForm({ token }) {
   useEffect(() => {
     if (id) {
       // Fetch post if editing
-      axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`)
+      axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`, {
+        headers: {
+          'x-auth-token': token,
+        }
+      })
         .then((res) => {
           setTitle(res.data.title);
           setBody(res.data.body);
@@ -42,10 +46,13 @@ function PostForm({ token }) {
         })
         .catch((err) => console.error(err));
     }
-  }, [id]);
+  }, [id, token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Log the token being sent in headers
+    console.log('Token being sent in headers:', token);
 
     const formData = new FormData();
     formData.append('title', title);
@@ -53,9 +60,6 @@ function PostForm({ token }) {
     // Convert the HTML from ReactQuill to Markdown using Turndown
     const markdownBody = turndownService.turndown(body);
     formData.append('body', markdownBody);
-
-    console.log('Title:', title);
-    console.log('Body (Markdown):', markdownBody);
 
     // Check if the image is selected
     if (image) {
@@ -69,9 +73,12 @@ function PostForm({ token }) {
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'x-auth-token': token
-        }
+          'x-auth-token': token,
+        },
       };
+
+      console.log('Form Data:', formData);
+      console.log('Config:', config);
 
       if (isEditing) {
         await axios.put(`${process.env.REACT_APP_API_URL}/posts/${id}`, formData, config);
@@ -81,7 +88,7 @@ function PostForm({ token }) {
 
       navigate('/');
     } catch (err) {
-      console.error('Error submitting form', err);
+      console.error('Error submitting form:', err);
     }
   };
 
@@ -102,7 +109,7 @@ function PostForm({ token }) {
             text-align: center;
             margin-bottom: 20px;
             font-size: 2rem;
-            color: #000; /* Dark blue */
+            color: #000;
           }
 
           .post-form-container input[type="text"] {
@@ -117,7 +124,7 @@ function PostForm({ token }) {
           }
 
           .post-form-container input[type="text"]:focus {
-            border-color: #F33535; /* Primary red */
+            border-color: #F33535;
             outline: none;
           }
 
@@ -129,7 +136,7 @@ function PostForm({ token }) {
             display: block;
             width: 100%;
             padding: 10px;
-            background-color: #F33535; /* Primary red */
+            background-color: #F33535;
             color: #fff;
             border: none;
             border-radius: 5px;
