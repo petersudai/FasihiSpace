@@ -35,3 +35,23 @@ npm start
 This will start the frontend app at http://localhost:3000.
 
 Visit http://localhost:3000 to interact with the platform’s frontend
+
+
+API Endpoints
+
+Authentication
+POST /api/auth/register: Register new user
+POST /api/auth/login: Log in a registered user
+
+Posts
+GET /api/posts: Fetch all posts.
+GET /api/posts/:id: Fetch a single post by ID
+POST /api/posts: Create a new post (requires authentication)
+PUT /api/posts/:id: Update a post by ID (requires authentication)
+DELETE /api/posts/:id: Delete a post by ID (requires authentication)
+
+Likes
+POST /api/likes/:id: Like or unlike a post (requires authentication)
+
+Comments
+POST /api/comments/:postId: Add a comment to a post (requires authentication)
