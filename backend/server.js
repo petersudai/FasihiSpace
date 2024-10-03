@@ -40,6 +40,11 @@ app.use('/api/profile', require('./routes/profile'));
 app.use('/api/comments', require('./routes/comment'));
 app.use('/api/likes', require('./routes/likes'));
 
+app.use((req, res, next) => {
+  console.log(`Request received: ${req.method} ${req.url}`);
+  next();
+});
+
 // Test route for debugging CORS
 app.get('/test', (req, res) => {
   res.json({ message: 'CORS is working!' });
