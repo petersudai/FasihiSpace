@@ -45,6 +45,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// Error Handling
+app.use((err, req, res, next) => {
+  console.error('Error:', err.stack);
+  res.status(500).json({
+    message: 'Internal Server Error',
+    error: err.message,
+  });
+});
+
 // Test route for debugging CORS
 app.get('/test', (req, res) => {
   res.json({ message: 'CORS is working!' });
