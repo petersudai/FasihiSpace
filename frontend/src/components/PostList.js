@@ -11,6 +11,7 @@ function PostList() {
     const fetchPosts = async () => {
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/posts`);
+        console.log('API URL:', process.env.REACT_APP_API_URL);
         setPosts(res.data);
         setFilteredPosts(res.data);
       } catch (err) {
