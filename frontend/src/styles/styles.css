@@ -89,8 +89,8 @@
     background-color: var(--dark-blue);
     margin-bottom: 20px;
     padding: 20px;
-    /* border: 1px solid var(--primary-red); */
   }
+  
   .post-container {
     margin: 20px;
     padding: 20px;
